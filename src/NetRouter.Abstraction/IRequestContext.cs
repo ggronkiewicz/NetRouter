@@ -9,6 +9,6 @@
 
         HttpClient HttpClient { get; set; }
 
-        Task<IResponse> GetResponse();
+        //Task<IResponse> GetResponse();
     }
 }

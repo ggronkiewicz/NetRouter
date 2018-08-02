@@ -6,6 +6,8 @@
     {
         public Dictionary<string, Mapping> Mappings { get; set; }
 
+        public Dictionary<string, string> Filters { get; set; }
+
         public Dictionary<string, CertificateConfiguration> Certificates { get; set; }
     }
 }

@@ -1,6 +1,7 @@
 ﻿namespace NetRouter.Processing
 {
     using System;
+    using System.Collections.Generic;
     using System.Linq;
     using System.Text;
     using System.Threading.Tasks;
@@ -10,11 +11,12 @@
     using Microsoft.Extensions.Logging;
     using Microsoft.Extensions.Primitives;
     using NetRouter.Abstraction.Configuration;
+    using NetRouter.Abstraction.Filters;
     using NetRouter.Message;
 
     public class NetRouterServer : INetRouter
     {
-        private Func<IRequestContext, Task<IResponse>> routerSteps;
+        private FilterAction routerSteps;
         private ISetupConfiguration setupConfiguration;
         private readonly ILogger logger;
 
@@ -67,13 +69,10 @@
         {
             this.setupConfiguration = configuration ?? throw new ArgumentNullException(nameof(configuration));
 
-            this.routerSteps = async (context) => { return await context.GetResponse(); };
-            for (int i = this.setupConfiguration.Filters.Count - 1; i >= 0; i--)
-            {
-                var item = this.setupConfiguration.Filters[i];
-                var nextStep = this.routerSteps;
-                this.routerSteps = async (context) => await item.Execute(context, nextStep);
-            }
+            var list = new List<IFilter>(configuration.Filters);
+            list.Add(new RequestForwarder());
+
+            this.routerSteps = FiltersPipelineFactory.Create(list, this.logger);
         }
     }
 }

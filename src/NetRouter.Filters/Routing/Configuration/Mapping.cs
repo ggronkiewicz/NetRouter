@@ -21,6 +21,8 @@
 
         public string[] TargetHosts { get; set; }
 
+        public string[] Filters { get; set; }
+
         public HostString GetRandomHost()
         {
             if (this.TargetHosts == null || this.TargetHosts.Length == 0)

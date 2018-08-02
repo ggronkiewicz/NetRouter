@@ -9,7 +9,6 @@
     public class ConfigurationContainerTests
     {
         [Theory]
-        [InlineData("")]
         [InlineData("111")]
         [InlineData("111:222")]
         [InlineData("111:22:3")]

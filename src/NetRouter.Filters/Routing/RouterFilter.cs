@@ -39,7 +39,7 @@
             configurationContainer.Configure<RoutingConfiguration>(string.Empty, cfg => { this.routingConfiguration = cfg; });
         }
 
-        public async Task<IResponse> Execute(IRequestContext requestContext, Func<IRequestContext, Task<IResponse>> next)
+        public async Task<IResponse> Execute(IRequestContext requestContext, FilterAction next)
         {
             var cfg = this.routingConfiguration;
             if (cfg.Mappings == null || cfg.Mappings.Count == 0)

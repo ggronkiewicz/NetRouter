@@ -21,7 +21,7 @@
         private readonly PathString Path = "/test";
         private readonly PathString ReplacedPath = "/replaced";
         private readonly HostString TargetHost = new HostString("0.0.0.1:80");
-        private readonly Func<IRequestContext, Task<IResponse>> emptyNext = context => Task.FromResult<IResponse>(null);
+        private readonly FilterAction emptyNext = context => Task.FromResult<IResponse>(null);
 
         [Fact]
         public async Task NotMatchPathTest()
@@ -40,7 +40,7 @@
             var filter = this.CreateRoutingFilter(MappingStrategy.None);
             IRequestContext context = this.CreateRequestContext("http://localhost/test");
 
-            Func<IRequestContext, Task<IResponse>> next = contextCheck =>
+            FilterAction next = contextCheck =>
             {
                 contextCheck.HttpClient.Should().NotBeNull();
                 contextCheck.Request.UrlPath.Should().Be(Path);
@@ -59,7 +59,7 @@
             var filter = this.CreateRoutingFilter(MappingStrategy.StripPath);
             IRequestContext context = this.CreateRequestContext("http://localhost/test" + newPatch);
 
-            Func<IRequestContext, Task<IResponse>> next = contextCheck =>
+            FilterAction next = contextCheck =>
             {
                 contextCheck.HttpClient.Should().NotBeNull();
                 contextCheck.Request.UrlPath.Should().Be(newPatch);
@@ -77,7 +77,7 @@
             var filter = this.CreateRoutingFilter(MappingStrategy.Replace);
             IRequestContext context = this.CreateRequestContext("http://localhost/test");
 
-            Func<IRequestContext, Task<IResponse>> next = contextCheck =>
+            FilterAction next = contextCheck =>
             {
                 contextCheck.HttpClient.Should().NotBeNull();
                 contextCheck.Request.UrlPath.Should().Be(ReplacedPath);
