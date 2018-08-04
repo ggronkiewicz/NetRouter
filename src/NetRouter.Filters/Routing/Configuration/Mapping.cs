@@ -4,6 +4,7 @@
     using System.Linq;
 
     using Microsoft.AspNetCore.Http;
+    using NetRouter.Abstraction.Filters;
 
     public class Mapping
     {
@@ -38,5 +39,7 @@
             this.random = this.random ?? new Random();
             return new HostString(this.TargetHosts[this.random.Next(0, this.TargetHosts.Length)]);
         }
+
+        internal FilterAction ProcessingAction { get; set; }
     }
 }

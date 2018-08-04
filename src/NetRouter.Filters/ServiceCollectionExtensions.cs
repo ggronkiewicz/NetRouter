@@ -7,6 +7,7 @@
     using NetRouter.Filters.Common;
     using NetRouter.Filters.Routing;
     using NetRouter.Routing;
+    using NetRouter.Filters.Routing.MappingFilters;
 
     public static class ServiceCollectionExtensions
     {
@@ -25,6 +26,7 @@
             serviceCollection.AddSingleton<IConfigurationContainer>(new ConfigurationContainer(configuration));
             serviceCollection.AddSingleton<IHttpClientFactory, HttpClientFactory>();
             serviceCollection.AddSingleton<ICertificateProvider, CertificateProvider>();
+            serviceCollection.AddSingleton<IFilterActionFactory, FilterActionFactory>();
 
             // filters
             serviceCollection.AddSingleton<RouterFilter>();

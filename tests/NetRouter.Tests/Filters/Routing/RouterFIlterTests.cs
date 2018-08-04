@@ -8,6 +8,7 @@
     using NetRouter.Configuration.Routing;
     using NetRouter.Filters.Common;
     using NetRouter.Filters.Routing;
+    using NetRouter.Filters.Routing.MappingFilters;
     using NetRouter.Processing;
     using NetRouter.Routing;
     using System;
@@ -140,7 +141,11 @@
             httpClientFactoryMock.Setup(x => x.Create(It.IsAny<HttpClientConfiguration>()))
                 .Returns(new HttpClient());
 
-            return new RouterFilter(configurationMock.Object, httpClientFactoryMock.Object);
+            var filterActionFactoryMock = new Mock<IFilterActionFactory>();
+            filterActionFactoryMock.Setup(x => x.CreateFilterAction(It.IsAny<FilterAction>(), It.IsAny<IEnumerable<string>>()))
+                .Returns<FilterAction, IEnumerable<string>>((fa, array) => fa);
+
+            return new RouterFilter(configurationMock.Object, httpClientFactoryMock.Object, filterActionFactoryMock.Object);
         }
 
         private IRequestContext CreateRequestContext(string url, string method = "GET", Dictionary<string, IEnumerable<string>> headers = null)

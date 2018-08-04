@@ -1,18 +1,15 @@
 ﻿namespace NetRouter.Filters.Routing
 {
     using System;
-    using System.Collections.Concurrent;
     using System.Collections.Generic;
     using System.Linq;
-    using System.Net.Http;
     using System.Threading.Tasks;
-    using Microsoft.Extensions.Configuration;
-    using Microsoft.Extensions.Primitives;
 
     using NetRouter.Abstraction;
     using NetRouter.Abstraction.Filters;
     using NetRouter.Configuration.Routing;
     using NetRouter.Filters.Common;
+    using NetRouter.Filters.Routing.MappingFilters;
     using NetRouter.Routing;
 
     public class RouterFilter : IFilter
@@ -31,11 +28,15 @@
 
         private readonly IHttpClientFactory httpClientFactory;
 
+        private readonly IFilterActionFactory filterActionFactory;
+
         public RouterFilter(
             IConfigurationContainer configurationContainer,
-            IHttpClientFactory httpClientFactory)
+            IHttpClientFactory httpClientFactory,
+            IFilterActionFactory filterActionFactory)
         {
             this.httpClientFactory = httpClientFactory;
+            this.filterActionFactory = filterActionFactory;
             configurationContainer.Configure<RoutingConfiguration>(string.Empty, cfg => { this.routingConfiguration = cfg; });
         }
 
@@ -47,7 +48,6 @@
                 return null;
             }
 
-            bool found = false;
             foreach (var cfgMapping in cfg.Mappings)
             {
                 if (requestContext.Request.UrlPath.StartsWithSegments(cfgMapping.Value.Path, out var remaining))
@@ -67,24 +67,23 @@
 
                     requestContext.HttpClient = this.httpClientFactory.Create(cfgMapping.Value.HttpClient);
                     requestContext.Request.Protocol = cfgMapping.Value.Protocol.ToString().ToLower();
-                    found = true;
-                    break;
+
+                    var host = ClearHeaders(requestContext.Request.Headers, new[] { requestContext.Request.UrlHost.Value });
+
+                    if (cfgMapping.Value.ProcessingAction == null)
+                    {
+                        cfgMapping.Value.ProcessingAction = this.filterActionFactory.CreateFilterAction(next, cfgMapping.Value.Filters);
+                    }
+
+                    IResponse response = await cfgMapping.Value.ProcessingAction(requestContext);
+                    ClearHeaders(response?.Headers, host);
+
+                    return response;
                 }
             }
 
-            if (!found)
-            {
-                // routing Not Foud
-                return null;
-            }
-
-            var host = ClearHeaders(requestContext.Request.Headers, new[] { requestContext.Request.UrlHost.Value });
-
-            var response = await next(requestContext);
-
-            ClearHeaders(response?.Headers, host);
-
-            return response;
+            // routing Not Foud
+            return null;
         }
 
         private static IEnumerable<string> ClearHeaders(IDictionary<string, IEnumerable<string>> headers, IEnumerable<string> hostName)
