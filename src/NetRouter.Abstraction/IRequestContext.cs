@@ -1,14 +1,14 @@
 ﻿namespace NetRouter.Abstraction
 {
+    using System;
     using System.Net.Http;
-    using System.Threading.Tasks;
 
-    public interface IRequestContext
+    public interface IRequestContext : IDisposable
     {
         IRequest Request { get; }
 
         HttpClient HttpClient { get; set; }
 
-        //Task<IResponse> GetResponse();
+        void RegisterForDispose(IDisposable disposable);
     }
 }

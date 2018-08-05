@@ -8,6 +8,10 @@
     {
         public IList<IFilter> Filters { get; }
 
+        public bool EnabledRewindRequest { get; set; }
+
+        public bool EnabledRewindResponse { get; set; }
+
         public SetupConfiguration()
         {
             this.Filters = new List<IFilter>();

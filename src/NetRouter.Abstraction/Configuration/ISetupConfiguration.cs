@@ -6,5 +6,9 @@
     public interface ISetupConfiguration
     {
         IList<IFilter> Filters { get; }
+
+        bool EnabledRewindRequest { get; }
+
+        bool EnabledRewindResponse { get; }
     }
 }

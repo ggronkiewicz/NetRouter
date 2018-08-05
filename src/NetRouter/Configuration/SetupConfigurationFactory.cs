@@ -37,5 +37,12 @@
             this.configuration.Filters.Add(filter);
             return this;
         }
+
+        public ISetupConfigurationFactory EnableRewind(bool request = true, bool response = true)
+        {
+            this.configuration.EnabledRewindRequest = request;
+            this.configuration.EnabledRewindResponse = response;
+            return this;
+        }
     }
 }

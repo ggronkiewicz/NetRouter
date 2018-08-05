@@ -2,6 +2,7 @@
 {
     using Microsoft.AspNetCore.Http;
     using System.Collections.Generic;
+    using System.IO;
 
     public interface IRequest
     {
@@ -17,6 +18,6 @@
 
         IDictionary<string, IEnumerable<string>> Headers { get; }
 
-        IMessageBody Body { get; }
+        Stream Body { get; set; }
     }
 }

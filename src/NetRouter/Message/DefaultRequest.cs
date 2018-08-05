@@ -5,6 +5,7 @@
 
     using Microsoft.AspNetCore.Http;
     using global::NetRouter.Abstraction;
+    using System.IO;
 
     public class DefaultRequest : IRequest
     {
@@ -16,14 +17,14 @@
             this.UrlHost = contextRequest.Host;
             this.Protocol = contextRequest.Protocol;
             this.Headers = contextRequest.Headers.ToDictionary(x => x.Key, y => y.Value as IEnumerable<string>);
-            this.Body = this.Method.Equals("get", System.StringComparison.OrdinalIgnoreCase) ? null : new StreamMessageBody(contextRequest.Body);
+            this.Body = this.Method.Equals("get", System.StringComparison.OrdinalIgnoreCase) ? null : contextRequest.Body;
         }
 
         public string Method { get; set; }
 
         public IDictionary<string, IEnumerable<string>> Headers { get; }
 
-        public IMessageBody Body { get; set; }
+        public Stream Body { get; set; }
 
         public PathString UrlPath { get; set; }
         public QueryString UrlQuery { get; set; }

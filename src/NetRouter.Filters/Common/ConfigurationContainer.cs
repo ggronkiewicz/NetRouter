@@ -20,7 +20,8 @@
             configurationCallback?.Invoke(configurationItem);
 
             ChangeToken.OnChange(this.configuration.GetReloadToken, action => {
-                var obj = configuration.GetSection(sectionName).Get<T>();
+                var sectionOnChange = string.IsNullOrEmpty(sectionName) ? configuration : configuration.GetSection(sectionName);
+                var obj = sectionOnChange.Get<T>();
                 action?.Invoke(obj);
             }, configurationCallback);
         }

@@ -4,11 +4,19 @@
     using System.Net.Http;
     using System.Threading.Tasks;
     using NetRouter.Abstraction;
+    using NetRouter.Abstraction.Configuration;
     using NetRouter.Abstraction.Filters;
     using NetRouter.Message;
 
     internal class RequestForwarder : IFilter
     {
+        private readonly ISetupConfiguration setupConfiguration;
+
+        public RequestForwarder(ISetupConfiguration setupConfiguration)
+        {
+            this.setupConfiguration = setupConfiguration;
+        }
+
         public async Task<IResponse> Execute(IRequestContext requestContext, FilterAction next)
         {
             if (requestContext == null)
@@ -29,9 +37,9 @@
             uriBuilder.Scheme = requestContext.Request.Protocol;
 
             StreamContent streamContent = null;
-            if (requestContext.Request.Body != null && requestContext.Request.Body.Content != null && requestContext.Request.Body.Content.CanRead)
+            if (requestContext.Request.Body != null && requestContext.Request.Body != null && requestContext.Request.Body.CanRead)
             {
-                streamContent = new StreamContent(requestContext.Request.Body.Content);
+                streamContent = new StreamContent(requestContext.Request.Body);
             }
 
             HttpRequestMessage message = new HttpRequestMessage(new HttpMethod(requestContext.Request.Method), uriBuilder.Uri);
@@ -67,7 +75,12 @@
                     }
                 }
 
-                response.Body = new StreamMessageBody(await responseMessage.Content.ReadAsStreamAsync());
+                response.Body = await responseMessage.Content.ReadAsStreamAsync();
+
+                if (this.setupConfiguration.EnabledRewindResponse)
+                {
+                    requestContext.BufferingResponseStream(response);
+                }
             }
 
             return response;

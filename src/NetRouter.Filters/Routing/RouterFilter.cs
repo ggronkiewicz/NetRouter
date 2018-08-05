@@ -37,7 +37,13 @@
         {
             this.httpClientFactory = httpClientFactory;
             this.filterActionFactory = filterActionFactory;
-            configurationContainer.Configure<RoutingConfiguration>(string.Empty, cfg => { this.routingConfiguration = cfg; });
+            configurationContainer.Configure<RoutingConfiguration>(string.Empty, cfg =>
+            {
+                cfg.Mappings = cfg.Mappings?.OrderByDescending(x => x.Value?.Path.Value.Length)
+                    .ToDictionary(x => x.Key, x => x.Value);
+
+                this.routingConfiguration = cfg;
+            });
         }
 
         public async Task<IResponse> Execute(IRequestContext requestContext, FilterAction next)

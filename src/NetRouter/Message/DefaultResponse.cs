@@ -1,6 +1,7 @@
 ﻿namespace NetRouter.Message
 {
     using System.Collections.Generic;
+    using System.IO;
     using global::NetRouter.Abstraction;
 
     internal class DefaultResponse : IResponse
@@ -14,6 +15,6 @@
 
         public IDictionary<string, IEnumerable<string>> Headers { get; set; }
 
-        public IMessageBody Body { get; set; }
+        public Stream Body { get; set; }
     }
 }

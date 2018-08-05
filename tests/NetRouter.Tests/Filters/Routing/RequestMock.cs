@@ -3,6 +3,7 @@
     using Microsoft.AspNetCore.Http;
     using NetRouter.Abstraction;
     using System.Collections.Generic;
+    using System.IO;
 
     class RequestMock : IRequest
     {
@@ -14,7 +15,8 @@
 
         public IDictionary<string, IEnumerable<string>> Headers { get; set; } = new Dictionary<string, IEnumerable<string>>();
 
-        public IMessageBody Body { get; set; }
+        public Stream Body { get; set; }
+
         public bool Ssl { get; set; }
     }
 }

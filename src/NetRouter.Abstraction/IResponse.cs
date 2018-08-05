@@ -1,6 +1,7 @@
 ﻿namespace NetRouter.Abstraction
 {
     using System.Collections.Generic;
+    using System.IO;
 
     public interface IResponse
     {
@@ -8,6 +9,6 @@
 
         IDictionary<string, IEnumerable<string>> Headers { get; }
 
-        IMessageBody Body { get; }
+        Stream Body { get; set; }
     }
 }

@@ -159,7 +159,7 @@
             requestMock.Method = method;
             requestMock.Headers = headers;
 
-            return new RequestContext(requestMock);
+            return new RequestContext(requestMock, null);
         }
     }
 }

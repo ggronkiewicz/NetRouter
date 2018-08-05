@@ -7,5 +7,7 @@
         ISetupConfigurationFactory AddFilter(IFilter filter);
 
         ISetupConfigurationFactory AddFilter<TFilter>() where TFilter : IFilter;
+
+        ISetupConfigurationFactory EnableRewind(bool request = true, bool response = true);
     }
 }

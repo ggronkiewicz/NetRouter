@@ -30,23 +30,25 @@
             var request = new DefaultRequest(context.Request);
             try
             {
-                var response = await this.ProcessRequest(request);
-                if (response == null)
+                await this.ProcessRequestAsync(request, async response =>
                 {
-                    await next();
-                    return;
-                }
+                    if (response == null)
+                    {
+                        await next();
+                        return;
+                    }
 
-                context.Response.StatusCode = response.Status;
-                foreach (var header in response.Headers)
-                {
-                    context.Response.Headers.Add(header.Key, new StringValues(header.Value.ToArray()));
-                }
+                    context.Response.StatusCode = response.Status;
+                    foreach (var header in response.Headers)
+                    {
+                        context.Response.Headers.Add(header.Key, new StringValues(header.Value.ToArray()));
+                    }
 
-                if (response.Body != null)
-                {
-                    await response.Body.Content.CopyToAsync(context.Response.Body);
-                }
+                    if (response.Body != null && response.Body.CanRead)
+                    {
+                        await response.Body.CopyToAsync(context.Response.Body);
+                    }
+                });
             }
             catch (Exception ex)
             {
@@ -58,21 +60,52 @@
             }
         }
 
-        public async Task<IResponse> ProcessRequest(IRequest request)
-        {
-            var context = new RequestContext(request);
-
-            return await routerSteps(context);
-        }
-
         public void Setup(ISetupConfiguration configuration)
         {
             this.setupConfiguration = configuration ?? throw new ArgumentNullException(nameof(configuration));
 
             var list = new List<IFilter>(configuration.Filters);
-            list.Add(new RequestForwarder());
+            list.Add(new RequestForwarder(this.setupConfiguration));
 
             this.routerSteps = FiltersPipelineFactory.Create(list, this.logger);
+        }
+
+        public async Task ProcessRequestAsync(IRequest request)
+        {
+            if (request != null)
+            {
+                using (var context = new RequestContext(request, this.logger))
+                {
+                    if (this.setupConfiguration.EnabledRewindRequest)
+                    {
+                        context.BufferingRequestStream();
+                    }
+
+                    await routerSteps(context);
+                }
+            }
+        }
+
+        public async Task ProcessRequestAsync(IRequest request, Func<IResponse, Task> responseCallback)
+        {
+            if (responseCallback == null)
+            {
+                throw new ArgumentNullException(nameof(responseCallback));
+            }
+
+            if (request != null)
+            {
+                using (var context = new RequestContext(request, this.logger))
+                {
+                    if (this.setupConfiguration.EnabledRewindRequest)
+                    {
+                        context.BufferingRequestStream();
+                    }
+
+                    var response = await routerSteps(context);
+                    await responseCallback(response);
+                }
+            }
         }
     }
 }

@@ -34,6 +34,7 @@
 
             app.UseNetRouter(cfg =>
             {
+                cfg.EnableRewind();
                 cfg.AddRouter();
             });
         }
