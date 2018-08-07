@@ -17,7 +17,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "tests", "tests", "{2891B8B1
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "NetRouter.Tests", "tests\NetRouter.Tests\NetRouter.Tests.csproj", "{88D5AFFB-BA21-4E64-8F73-CFEEBCCBFD3A}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NetRouter.Filters", "src\NetRouter.Filters\NetRouter.Filters.csproj", "{FD40C86E-E24D-4786-8799-E527BF742F0D}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "NetRouter.Filters", "src\NetRouter.Filters\NetRouter.Filters.csproj", "{FD40C86E-E24D-4786-8799-E527BF742F0D}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
